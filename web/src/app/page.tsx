@@ -23,16 +23,16 @@ async function getUsers(): Promise<CreateWhizUser[]> {
 
   const { data: customers } = await supabase
     .from("cms_customers")
-    .select("guid, full_name, email, username")
-    .in("guid", guids);
+    .select("guid, full_name, email, username, phone_number")
 
-  const customerMap = new Map<string, { full_name: string | null; email: string | null; username: string | null }>();
+  const customerMap = new Map<string, { full_name: string | null; email: string | null; username: string | null; phone: string | null }>();
   if (customers) {
     for (const c of customers) {
       customerMap.set(c.guid, {
         full_name: c.full_name || c.username || null,
         email: c.email || null,
         username: c.username || null,
+        phone: c.phone_number || null,
       });
     }
   }
@@ -52,6 +52,7 @@ async function getUsers(): Promise<CreateWhizUser[]> {
         user_id: txn.user_id,
         full_name: c?.full_name ?? null,
         email: c?.email ?? null,
+        phone: c?.phone ?? null,
         guid: txn.user_id,
         total_credits: 0,
         total_debits: 0,
@@ -129,7 +130,7 @@ export default async function Dashboard() {
                     <td className="px-6 py-3 text-right">{u.total_debits}</td>
                     <td className="px-6 py-3 text-right font-semibold">{u.balance}</td>
                     <td className="px-6 py-3 text-center">
-                      {u.guid ? <DeliverableModal guid={u.guid} email={u.email} userName={u.full_name} /> : "—"}
+                      {u.guid ? <DeliverableModal guid={u.guid} email={u.email} phone={u.phone} userName={u.full_name} /> : "—"}
                     </td>
                   </tr>
                 ))

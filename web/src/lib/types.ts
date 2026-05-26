@@ -2,6 +2,7 @@ export interface CreateWhizUser {
   user_id: string;
   full_name: string | null;
   email: string | null;
+  phone: string | null;
   guid: string | null;
   total_credits: number;
   total_debits: number;

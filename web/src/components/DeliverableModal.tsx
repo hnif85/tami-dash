@@ -17,7 +17,7 @@ function proxied(url?: string | null) {
   return `/api/deliverables/file?url=${encodeURIComponent(full)}`;
 }
 
-export default function DeliverableModal({ guid, email, userName }: { guid: string; email?: string | null; userName?: string | null }) {
+export default function DeliverableModal({ guid, email, phone, userName }: { guid: string; email?: string | null; phone?: string | null; userName?: string | null }) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<{ deliverables?: Deliverable[] } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ export default function DeliverableModal({ guid, email, userName }: { guid: stri
       if (!res.ok) return;
       const blob = await res.blob();
       const ext = d.filename ? d.filename.substring(d.filename.lastIndexOf(".")) : ".bin";
-      const baseName = [email || "unknown", userName || "unknown", d.filename || "file"].filter(Boolean).join("+");
+      const baseName = [email || "unknown", phone || "unknown", userName || "unknown", d.filename || "file"].filter(Boolean).join("+");
       const fileName = baseName.endsWith(ext) ? baseName : baseName + ext;
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
