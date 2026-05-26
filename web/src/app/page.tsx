@@ -129,7 +129,7 @@ export default async function Dashboard() {
                     <td className="px-6 py-3 text-right">{u.total_debits}</td>
                     <td className="px-6 py-3 text-right font-semibold">{u.balance}</td>
                     <td className="px-6 py-3 text-center">
-                      {u.guid ? <DeliverableModal guid={u.guid} /> : "—"}
+                      {u.guid ? <DeliverableModal guid={u.guid} email={u.email} userName={u.full_name} /> : "—"}
                     </td>
                   </tr>
                 ))

@@ -17,7 +17,7 @@ function proxied(url?: string | null) {
   return `/api/deliverables/file?url=${encodeURIComponent(full)}`;
 }
 
-export default function DeliverableModal({ guid }: { guid: string }) {
+export default function DeliverableModal({ guid, email, userName }: { guid: string; email?: string | null; userName?: string | null }) {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<{ deliverables?: Deliverable[] } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,6 +46,28 @@ export default function DeliverableModal({ guid }: { guid: string }) {
   }
 
   const deliverables = data?.deliverables ?? [];
+
+  async function downloadFile(d: Deliverable) {
+    const proxyUrl = proxied(d.fileUrl);
+    if (!proxyUrl) return;
+    try {
+      const res = await fetch(proxyUrl);
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const ext = d.filename ? d.filename.substring(d.filename.lastIndexOf(".")) : ".bin";
+      const baseName = [email || "unknown", userName || "unknown", d.filename || "file"].filter(Boolean).join("+");
+      const fileName = baseName.endsWith(ext) ? baseName : baseName + ext;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    } catch {
+      // silent
+    }
+  }
 
   return (
     <>
@@ -185,14 +207,23 @@ export default function DeliverableModal({ guid }: { guid: string }) {
                           ))}
                         </div>
                       )}
-                      <a
-                        href={withBase(selected.fileUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2 inline-block rounded-lg bg-gray-800 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
-                      >
-                        Buka di tab baru
-                      </a>
+                      <div className="mt-2 flex gap-2">
+                        <a
+                          href={withBase(selected.fileUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block rounded-lg bg-gray-800 px-4 py-2 text-xs font-medium text-white hover:bg-gray-900"
+                        >
+                          Buka di tab baru
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => downloadFile(selected)}
+                          className="inline-block rounded-lg bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-800"
+                        >
+                          Save
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
