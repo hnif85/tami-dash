@@ -24,6 +24,7 @@ async function getUsers(): Promise<CreateWhizUser[]> {
   const { data: customers } = await supabase
     .from("cms_customers")
     .select("guid, full_name, email, username, phone_number")
+    .in("guid", guids)
 
   const customerMap = new Map<string, { full_name: string | null; email: string | null; username: string | null; phone: string | null }>();
   if (customers) {
